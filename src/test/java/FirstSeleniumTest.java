@@ -16,6 +16,19 @@ public class FirstSeleniumTest {
     public void setUp() throws MalformedURLException {
 
         ChromeOptions options = new ChromeOptions();
+        String seleniumUrl = System.getenv("SELENIUM_HOST");
+
+        if (seleniumUrl != null && !seleniumUrl.isEmpty()) {
+            driver = new RemoteWebDriver(new URL(seleniumUrl), options);
+        } else {
+            WebDriverManager.chromedriver().setup();
+            driver = new ChromeDriver(options);
+        }
+
+        driver.manage().window().maximize();
+
+
+        //      ChromeOptions options = new ChromeOptions();
 //        String seleniumUrl = System.getenv("SELENIUM_HOST");
 //        if (seleniumUrl == null || seleniumUrl.isEmpty()) {
 //            seleniumUrl = "http://localhost:4444/wd/hub";
@@ -24,8 +37,8 @@ public class FirstSeleniumTest {
 //        WebDriverManager.chromedriver().setup();
 //        driver = new ChromeDriver(options);
 //        driver.manage().window().maximize();
-        driver = new RemoteWebDriver(new URL("http://selenium:4444/wd/hub"), options);
-        driver.manage().window().maximize();
+//        driver = new RemoteWebDriver(new URL("http://selenium:4444/wd/hub"), options);
+//        driver.manage().window().maximize();
 
 
     }
