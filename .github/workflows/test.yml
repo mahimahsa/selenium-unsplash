@@ -34,16 +34,6 @@ jobs:
       - name: Grant execute permission for wait script
         run: chmod +x wait-for-selenium.sh
 
-      - name: Print environment
-        run: |
-          echo "JAVA version:"
-          java -version
-
-          echo "Gradle version:"
-          ./gradlew --version
-
-          echo "SELENIUM_HOST: $SELENIUM_HOST"  
-
       - name: Wait for Selenium
         run: |
           echo "Starting wait-for-selenium..."
