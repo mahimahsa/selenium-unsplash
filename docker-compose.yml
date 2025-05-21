@@ -1,0 +1,15 @@
+version: '3.7'
+
+services:
+  selenium:
+    image: selenium/standalone-chrome:4.19.1
+    ports:
+      - "4444:4444"
+    shm_size: 2g
+
+  test-runner:
+    build: .
+    depends_on:
+      - selenium
+    environment:
+      - SELENIUM_HOST=http://selenium:4444/wd/hub

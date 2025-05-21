@@ -1,0 +1,40 @@
+name: Selenium UI Tests
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    services:
+      selenium:
+        image: selenium/standalone-chrome:4.19.1
+        ports:
+          - 4444:4444
+        options: >-
+          --shm-size=2g
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Grant execute permission for wait script
+        run: chmod +x wait-for-selenium.sh
+
+      - name: Wait for Selenium
+        run: ./wait-for-selenium.sh
+
+      - name: Run tests
+        run: ./gradlew clean test --no-daemon
+        env:
+          SELENIUM_HOST: http://localhost:4444/wd/hub

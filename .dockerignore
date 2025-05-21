@@ -1,0 +1,26 @@
+# Ignore build output
+/build
+/.gradle
+
+# IntelliJ & Eclipse
+.idea
+*.iml
+*.ipr
+*.iws
+*.classpath
+*.project
+*.settings/
+
+# OS/Tooling
+.DS_Store
+Thumbs.db
+*.log
+
+# Git
+.git
+.gitignore
+
+# Temp files
+*.tmp
+*.swp
+*.bak
