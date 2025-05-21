@@ -2,7 +2,7 @@
 
 echo "Waiting for Selenium to be ready at $SELENIUM_HOST..."
 
-until curl -s "$SELENIUM_HOST/status" | grep '"ready": true' > /dev/null; do
+until curl -s "/status" | grep '"ready": true' > /dev/null; do
   attempts=$((attempts+1))
   echo "Attempt $attempts: Selenium not ready yet..."
   sleep 2
