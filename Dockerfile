@@ -6,4 +6,7 @@ COPY . .
 
 RUN chmod +x wait-for-selenium.sh
 
-CMD ./wait-for-selenium.sh && gradle clean test --no-daemon
+# Run the wait script and then tests at runtime
+ENTRYPOINT ["/bin/bash", "-c", "./wait-for-selenium.sh && gradle clean test --no-daemon"]
+
+#CMD ./wait-for-selenium.sh && gradle clean test --no-daemon
