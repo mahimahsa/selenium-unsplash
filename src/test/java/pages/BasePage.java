@@ -1,9 +1,9 @@
+package pages;
 
 import org.openqa.selenium.*;
 import org.openqa.selenium.support.ui.*;
 
 import java.time.Duration;
-import java.util.List;
 import java.util.Random;
 
 public abstract class BasePage {
@@ -57,4 +57,5 @@ public abstract class BasePage {
         JavascriptExecutor js = (JavascriptExecutor) driver;
         return js.executeScript(script, element);
     }
+
 }
