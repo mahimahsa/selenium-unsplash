@@ -1,5 +1,6 @@
 package pages;
 
+import helpers.Config;
 import org.openqa.selenium.By;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
@@ -16,27 +17,18 @@ public class LoginPage extends BasePage {
 
     public LoginPage(WebDriver driver) {
         super(driver);
-    }
-
-    public void open() {
-        driver.get("https://unsplash.com/login");
-    }
-
-    public void loginWithRandomData() {
-        type(emailField, randomText(8));
-        type(passwordField, randomText(10));
-        click(loginButton);
+        driver.get(Config.get("login.url"));
     }
 
     public void loginWithWrongPassword() {
-        type(emailField, "mahsa.daemi.rm@gmail.com");
+        type(emailField, Config.get("valid.email"));
         type(passwordField, randomText(10));
         click(loginButton);
     }
 
     public void loginSuccessfully() {
-        type(emailField, "mahsa.daemi.rm@gmail.com");
-        type(passwordField, "Aa123456");
+        type(emailField, Config.get("valid.email"));
+        type(passwordField, Config.get("valid.password"));
         click(loginButton);
     }
 

@@ -1,5 +1,6 @@
-import helper.CookieConsent;
-import helper.LoginVerifier;
+import helpers.Config;
+import helpers.CookieConsent;
+import helpers.LoginVerifier;
 import io.github.bonigarcia.wdm.WebDriverManager;
 import org.junit.jupiter.api.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -17,6 +18,7 @@ import java.util.List;
 public class FirstSeleniumTest {
 
     WebDriver driver;
+
 
     @BeforeEach
     public void setUp() throws MalformedURLException {
@@ -40,7 +42,7 @@ public class FirstSeleniumTest {
 //    }
     @Test
     public void autoClickCookieConseptPopup(){
-        driver.get("https://unsplash.com/login");
+        driver.get(Config.get("login.url"));
         CookieConsent cookieConsent = new CookieConsent(driver);
         cookieConsent.suppressConsentPopup();
         List<WebElement> consentDialog = driver.findElements(By.xpath("//dialog//a[@href='/cookies#manage-consent']"));
@@ -48,9 +50,9 @@ public class FirstSeleniumTest {
     }
 
     @Test
+    @DisplayName("Login email validation shows native browser message")
     public void shouldShowEmailValidationMessage() {
         LoginPage loginPage = new LoginPage(driver);
-        loginPage.open();
         String message = loginPage.emailValidationMessage();
         System.out.println("Validation message: " + message);
         assertTrue(message.contains("Please include an '@'"));
@@ -59,7 +61,6 @@ public class FirstSeleniumTest {
     @Test
     public void shouldShowErrorForWrongPassword() {
         LoginPage loginPage = new LoginPage(driver);
-        loginPage.open();
         loginPage.loginWithWrongPassword();
         assertTrue(loginPage.isLoginErrorDisplayed());
     }
@@ -67,7 +68,6 @@ public class FirstSeleniumTest {
     @Test
     public void shouldLoginSuccessfully() {
         LoginPage loginPage = new LoginPage(driver);
-        loginPage.open();
         loginPage.loginSuccessfully();
         assertFalse(loginPage.isLoginErrorDisplayed());
     }
@@ -80,7 +80,6 @@ public class FirstSeleniumTest {
     @Test
     public void userShouldBeLoggedInAfterValidLogin() {
         LoginPage loginPage = new LoginPage(driver);
-        loginPage.open();
         loginPage.loginSuccessfully();
 
         LoginVerifier verifier = new LoginVerifier(driver);
