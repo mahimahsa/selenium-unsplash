@@ -42,7 +42,7 @@ public class FirstSeleniumTest {
 //    }
     @Test
     public void autoClickCookieConseptPopup(){
-        driver.get(Config.get("login.url"));
+        driver.get(Config.LOGIN);
         CookieConsent cookieConsent = new CookieConsent(driver);
         cookieConsent.suppressConsentPopup();
         List<WebElement> consentDialog = driver.findElements(By.xpath("//dialog//a[@href='/cookies#manage-consent']"));

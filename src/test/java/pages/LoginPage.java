@@ -17,18 +17,18 @@ public class LoginPage extends BasePage {
 
     public LoginPage(WebDriver driver) {
         super(driver);
-        driver.get(Config.get("login.url"));
+        driver.get(Config.LOGIN);
     }
 
     public void loginWithWrongPassword() {
-        type(emailField, Config.get("valid.email"));
+        type(emailField, Config.EMAIL);
         type(passwordField, randomText(10));
         click(loginButton);
     }
 
     public void loginSuccessfully() {
-        type(emailField, Config.get("valid.email"));
-        type(passwordField, Config.get("valid.password"));
+        type(emailField, Config.EMAIL);
+        type(passwordField, Config.PASSWORD);
         click(loginButton);
     }
 

@@ -5,6 +5,16 @@ import java.io.InputStream;
 import java.util.Properties;
 
 public class Config {
+    public static final String HOME = ConfigReader.get("base.url");
+    public static final String LOGIN = ConfigReader.get("login.url");
+    public static final String ACCOUNT = ConfigReader.get("account.url");
+    public static final String SEARCH = ConfigReader.get("search.url");
+    public static final String EMAIL = ConfigReader.get("valid.email");
+    public static final String PASSWORD = ConfigReader.get("valid.password");
+
+}
+
+ class ConfigReader {
     private static final Properties props = new Properties();
 
     static {
@@ -20,3 +30,4 @@ public class Config {
         return props.getProperty(key);
     }
 }
+
