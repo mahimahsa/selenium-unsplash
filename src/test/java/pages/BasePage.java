@@ -1,9 +1,10 @@
+package pages;
 
 import org.openqa.selenium.*;
+import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.*;
 
 import java.time.Duration;
-import java.util.List;
 import java.util.Random;
 
 public abstract class BasePage {
@@ -12,7 +13,7 @@ public abstract class BasePage {
 
     public BasePage(WebDriver driver) {
         this.driver = driver;
-        this.wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        this.wait = new WebDriverWait(driver, Duration.ofSeconds(3));
     }
 
     protected void click(By locator) {
@@ -57,4 +58,10 @@ public abstract class BasePage {
         JavascriptExecutor js = (JavascriptExecutor) driver;
         return js.executeScript(script, element);
     }
+
+    protected void hover(WebElement element) {
+        Actions action = new Actions(driver);
+        action.moveToElement(element).perform();
+    }
+
 }
