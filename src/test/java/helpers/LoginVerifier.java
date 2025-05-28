@@ -20,11 +20,11 @@ public class LoginVerifier {
 
     //Check if profile link is visible OR uuid cookie exists
     public boolean isUserLoggedIn() {
-        Cookie uuidCookie = driver.manage().getCookieNamed("uuid");
-        if (uuidCookie != null) return true;
+        Cookie token = driver.manage().getCookieNamed(Config.COOKIE_TOKEN);
+        if (token != null) return true;
 
         List<WebElement> profileElements = driver.findElements(profileLink);
-        return !profileElements.isEmpty() && profileElements.get(0).isDisplayed();
+        return  !profileElements.isEmpty() && profileElements.get(0).isDisplayed();
     }
 
     //Clear cookies and try accessing protected page

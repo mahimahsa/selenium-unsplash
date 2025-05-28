@@ -1,18 +1,24 @@
-import helpers.Config;
-import helpers.CookieConsent;
-import helpers.LoginVerifier;
+import helpers.*;
 import io.github.bonigarcia.wdm.WebDriverManager;
 import org.junit.jupiter.api.*;
 import static org.junit.jupiter.api.Assertions.*;
+
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.*;
+import org.openqa.selenium.support.ui.ExpectedCondition;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
+import pages.HomePage;
 import pages.LoginPage;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.time.Duration;
 import java.util.List;
 
 public class FirstSeleniumTest {
@@ -48,6 +54,10 @@ public class FirstSeleniumTest {
         List<WebElement> consentDialog = driver.findElements(By.xpath("//dialog//a[@href='/cookies#manage-consent']"));
         assertTrue( consentDialog.isEmpty());
     }
+
+//TEST LOGIN PROCESS: Test input validation and error handling in failed login on login page,
+//                    Test successful login with a valid credentials, Test being added userId to cookie,
+//                    Test redirecting to login page when a not-login user is in a protected page
 
     @Test
     @DisplayName("Login email validation shows native browser message")
@@ -85,8 +95,72 @@ public class FirstSeleniumTest {
         LoginVerifier verifier = new LoginVerifier(driver);
         assertTrue(verifier.isUserLoggedIn());
     }
+//// END LOGIN TEST ///////////////////////////////////
+
+// TEST HOME PAGE FUNCTIONALITY AND RESPONSIVENESS
+
+    @Test
+    @DisplayName("Home page title contains 'Unsplash'")
+    public void shouldReadHomePageTitle(){
+        HomePage homePage = new HomePage(driver);
+        assertTrue(homePage.getPageTitle().contains("Unsplash"));
+    }
+
+    @ParameterizedTest
+    @EnumSource(ViewMode.class)
+    @DisplayName("Header layout and content differs between desktop and mobile")
+    void headerShouldChangeBetweenScreenModes(ViewMode mode) {
+        WebDriverManager.chromedriver().setup();
+        WebDriver localDriver = new ChromeDriver(ChromeViewMode.getMobileOptions(mode));
+        try {
+            HomePage homePage = new HomePage(localDriver);
+            if (mode == ViewMode.DESKTOP) {
+                assertEquals("flex", homePage.getMenuItemDisplay());
+            } else {
+                assertEquals("none", homePage.getMenuItemDisplay());
+            }
+        } finally {
+            localDriver.quit();
+        }
+    }
+
+    @Test
+    @DisplayName("Login first, logout by button click and check being logout")
+    public void logoutByButtonClick() {
+        LoginPage loginPage = new LoginPage(driver);
+        loginPage.loginSuccessfully();
+        HomePage homePage = new HomePage(driver);
+        homePage.logOut();
+        LoginVerifier loginVerifier = new LoginVerifier(driver);
+        assertFalse(loginVerifier.isUserLoggedIn());
+    }
+
+    @Test
+    @DisplayName("Hovers over the first image and checks if the like button appears")
+    public void hoverTest() throws InterruptedException {
+        HomePage homePage = new HomePage(driver);
+        assertTrue(homePage.imageHovered().isDisplayed(), "Like button should appear on hover");
+    }
+
+    @Test
+    @DisplayName("Navigating to photo and using browser back returns to home page")
+    void shouldNavigateToPhotoAndReturn() {
+        HomePage homePage = new HomePage(driver);
+        homePage.navigateToFirstPhotoAndBack();
+        assertEquals(Config.HOME, driver.getCurrentUrl());
+    }
+////// END HOME PAGE TEST ///////////////////////////////////
 
 
+/// Test file upload and fill textarea on account page///////
+
+
+
+
+
+
+
+////// END ACCOUNT PAGE TEST /////////////////////////////////
     @AfterEach
     public void tearDown() {
         if (driver != null) driver.quit();

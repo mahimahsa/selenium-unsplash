@@ -11,6 +11,8 @@ public class Config {
     public static final String SEARCH = ConfigReader.get("search.url");
     public static final String EMAIL = ConfigReader.get("valid.email");
     public static final String PASSWORD = ConfigReader.get("valid.password");
+    public static final String COOKIE_CONSENT = ConfigReader.get("cookie.consent");
+    public static final String COOKIE_TOKEN = ConfigReader.get("cookie.user.token");
 
 }
 

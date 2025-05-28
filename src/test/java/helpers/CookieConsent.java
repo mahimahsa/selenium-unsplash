@@ -8,12 +8,11 @@ public class CookieConsent {
     protected final WebDriver driver;
     public CookieConsent(WebDriver driver) {
         this.driver = driver;
-        driver.get("https://unsplash.com/login");
     }
 
     //Set fake consent cookie to avoid UI interaction
     public void suppressConsentPopup() {
-        Cookie consentCookie = new Cookie("cookie_consent", "true");
+        Cookie consentCookie = new Cookie(Config.COOKIE_CONSENT, "true");
         driver.manage().addCookie(consentCookie);
         driver.navigate().refresh();
     }
