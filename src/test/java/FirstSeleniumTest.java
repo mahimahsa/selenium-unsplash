@@ -9,6 +9,7 @@ import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.*;
@@ -19,6 +20,8 @@ import pages.AccountPage;
 import pages.HomePage;
 import pages.LoginPage;
 
+import java.io.File;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.Duration;
@@ -31,8 +34,8 @@ public class FirstSeleniumTest {
 
 
     @BeforeEach
-    public void setUp() throws MalformedURLException {
-
+    public void setUp(TestInfo testInfo) throws MalformedURLException {
+        if (testInfo.getTags().contains("no-setup")) return; // skip setup for parameterized tests
         ChromeOptions options = new ChromeOptions();
         String seleniumUrl = System.getenv("SELENIUM_HOST");
 
@@ -98,21 +101,39 @@ public class FirstSeleniumTest {
 
 
 
-//// TEST HOME PAGE FUNCTIONALITY AND RESPONSIVENESS/////////
-
+////// TEST HOME PAGE FUNCTIONALITY AND RESPONSIVENESS/////////
+//
     @ParameterizedTest
     @EnumSource(ViewMode.class)
+    @Tag("no-setup")
     @DisplayName("WebDriver configuration: Header layout and content differs between desktop and mobile")
     void headerShouldChangeBetweenScreenModes(ViewMode mode) throws MalformedURLException {
+//        WebDriver localDriver;
+//        ChromeOptions options = ChromeViewMode.getMobileOptions(mode);
+//        String seleniumUrl = System.getenv("SELENIUM_HOST");
+//
+//        if (seleniumUrl != null && !seleniumUrl.isEmpty()) {
+//            localDriver = new RemoteWebDriver(new URL(seleniumUrl), options);
+//        } else {
+//            WebDriverManager.chromedriver().setup();
+//            localDriver = new ChromeDriver(options);
+//        }
+        ChromeOptions options = new ChromeOptions();
         WebDriver localDriver;
-        ChromeOptions options = ChromeViewMode.getMobileOptions(mode);
         String seleniumUrl = System.getenv("SELENIUM_HOST");
-
         if (seleniumUrl != null && !seleniumUrl.isEmpty()) {
             localDriver = new RemoteWebDriver(new URL(seleniumUrl), options);
         } else {
             WebDriverManager.chromedriver().setup();
             localDriver = new ChromeDriver(options);
+        }
+
+
+// Just resize here
+        if (mode == ViewMode.MOBILE) {
+            localDriver.manage().window().setSize(new Dimension(375, 812));
+        } else {
+            localDriver.manage().window().maximize();
         }
 
 
@@ -158,7 +179,7 @@ public class FirstSeleniumTest {
 ////// END HOME PAGE TEST ///////////////////////////////////
 
 
-/// Test file upload and fill textarea on account page///////
+///// Test file upload and fill textarea on account page///////
         @Test
         @DisplayName("Bio textbox and Messaging checkbox should be updated on Account page")
         void shouldUpdateBioAndMessagingCheckbox() {
@@ -184,13 +205,14 @@ public class FirstSeleniumTest {
         }
         @Test
         @DisplayName("Profile image should be updated on Account page")
-        void shouldUpdateProfileImage() {
+        void shouldUpdateProfileImage() throws IOException {
+            //File imageFile = new File("src/test/resources/images/profile.jpg");
 
             LoginPage loginPage = new LoginPage(driver);
             loginPage.loginSuccessfully();
 
             AccountPage accountPage = new AccountPage(driver);
-            accountPage.uploadProfileImage(Config.PROFILE_IMAGE);
+            accountPage.uploadProfileImage();
 
             assertTrue(accountPage.isSuccessMessageDisplayed(), "The Success message should be displayed");
         }

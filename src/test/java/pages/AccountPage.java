@@ -1,8 +1,12 @@
 package pages;
 
 import helpers.Config;
+import helpers.ImageGenerator;
 import org.openqa.selenium.*;
 import org.openqa.selenium.support.ui.ExpectedConditions;
+
+import java.io.File;
+import java.io.IOException;
 import java.nio.file.Paths;
 
 public class AccountPage extends BasePage {
@@ -35,10 +39,22 @@ public class AccountPage extends BasePage {
             setCheckbox(checkBox, !checked);
         }
 
-        public void uploadProfileImage(String filename) {
-            String filePath = Paths.get("src", "test", "resources", filename).toAbsolutePath().toString();
+        public void uploadProfileImage() throws IOException {
+            //String filePath = Paths.get("src", "test", "resources", "images", filename).toAbsolutePath().toString();
+           //File imageFile = new File("src/test/resources/images/profile.jpg");
+            ImageGenerator imageGenerator= new ImageGenerator();
+            File imageFile = imageGenerator.createTempImage();
+            //System.out.println("Image file path>>>>>>>>: " + imageFile.getAbsolutePath());
+            //File imageFile = new File("/shared/test.jpg");
+
+            System.out.println("Image file path>>>>>>>>: " + imageFile.getAbsolutePath());
+            if (!imageFile.exists()) {
+                System.out.println(" File does NOT exist at: " + imageFile.getAbsolutePath());
+            } else {
+                System.out.println(" File exists at: " + imageFile.getAbsolutePath());
+            }
             WebElement upload = wait.until(ExpectedConditions.presenceOfElementLocated(uploadInput));
-            upload.sendKeys(filePath);
+            upload.sendKeys(imageFile.getAbsolutePath());
         }
 
         public boolean isSuccessMessageDisplayed() {
