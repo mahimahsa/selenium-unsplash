@@ -103,10 +103,18 @@ public class FirstSeleniumTest {
     @ParameterizedTest
     @EnumSource(ViewMode.class)
     @DisplayName("WebDriver configuration: Header layout and content differs between desktop and mobile")
-    void headerShouldChangeBetweenScreenModes(ViewMode mode) {
-        WebDriverManager.chromedriver().setup();
-        //initial a new instance of ChromeViewMode once by mobile options and then by start-maximized as desktop view
-        WebDriver localDriver = new ChromeDriver(ChromeViewMode.getMobileOptions(mode));
+    void headerShouldChangeBetweenScreenModes(ViewMode mode) throws MalformedURLException {
+        WebDriver localDriver;
+        ChromeOptions options = ChromeViewMode.getMobileOptions(mode);
+        String seleniumUrl = System.getenv("SELENIUM_HOST");
+
+        if (seleniumUrl != null && !seleniumUrl.isEmpty()) {
+            localDriver = new RemoteWebDriver(new URL(seleniumUrl), options);
+        } else {
+            WebDriverManager.chromedriver().setup();
+            localDriver = new ChromeDriver(options);
+        }
+
 
         try {
             HomePage homePage = new HomePage(localDriver);
