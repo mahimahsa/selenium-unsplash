@@ -4,7 +4,9 @@ import org.junit.jupiter.api.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.remote.RemoteWebDriver;
@@ -21,6 +23,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.Duration;
 import java.util.List;
+import java.util.stream.Stream;
 
 public class FirstSeleniumTest {
 
@@ -42,11 +45,6 @@ public class FirstSeleniumTest {
         driver.manage().window().maximize();
     }
 
-    @Test
-    public void openHomePage() {
-        driver.get("https://unsplash.com");
-        System.out.println("Title: " + driver.getTitle());
-    }
     @Test
     public void autoClickCookieConseptPopup(){
         driver.get(Config.LOGIN);
@@ -100,14 +98,7 @@ public class FirstSeleniumTest {
 
 
 
-// TEST HOME PAGE FUNCTIONALITY AND RESPONSIVENESS/////////
-
-    @Test
-    @DisplayName("Home page title contains 'Unsplash'")
-    public void shouldReadHomePageTitle(){
-        HomePage homePage = new HomePage(driver);
-        assertTrue(homePage.getPageTitle().contains("Unsplash"));
-    }
+//// TEST HOME PAGE FUNCTIONALITY AND RESPONSIVENESS/////////
 
     @ParameterizedTest
     @EnumSource(ViewMode.class)
@@ -168,7 +159,7 @@ public class FirstSeleniumTest {
 
             AccountPage accountPage = new AccountPage(driver);
 
-            //get the current values to check their difference after the update
+            //get the current values to check their differences after the update
             String oldBio = accountPage.readBio();
             boolean oldChecked = accountPage.getCheckbox();
             accountPage.toggleCheckbox(oldChecked);
@@ -195,9 +186,27 @@ public class FirstSeleniumTest {
 
             assertTrue(accountPage.isSuccessMessageDisplayed(), "The Success message should be displayed");
         }
-////// END ACCOUNT PAGE TEST /////////////////////////////////
+//////// END ACCOUNT PAGE TEST /////////////////////////////////
 
 
+////CHECK TITLE OF MULTIPLE PAGES FROM A STREAM/////////////////
+
+    static Stream<Arguments> staticPages() {
+        return Stream.of(
+                Arguments.of(Config.LICENSE_URL, Config.LICENSE_TITLE),
+                Arguments.of(Config.PRIVACY_URL, Config.PRIVACY_TITLE),
+                Arguments.of(Config.TERMS_URL, Config.TERMS_TITLE)
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("staticPages")
+    @DisplayName("Static pages load correctly and have expected titles")
+    void testStaticPages(String url, String expectedTitlePart) {
+        driver.get(url);
+        String actualTitle = driver.getTitle();
+        assertTrue(actualTitle.contains(expectedTitlePart), "Title should include: " + expectedTitlePart);
+    }
 
     @AfterEach
     public void tearDown() {
