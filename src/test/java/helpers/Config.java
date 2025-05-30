@@ -13,6 +13,7 @@ public class Config {
     public static final String PASSWORD = ConfigReader.get("valid.password");
     public static final String COOKIE_CONSENT = ConfigReader.get("cookie.consent");
     public static final String COOKIE_TOKEN = ConfigReader.get("cookie.user.token");
+    public static final String PROFILE_IMAGE = ConfigReader.get("profile.image");
 
 }
 

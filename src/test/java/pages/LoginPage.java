@@ -41,12 +41,7 @@ public class LoginPage extends BasePage {
     }
 
     public boolean isLoginErrorDisplayed() {
-        try {
-            WebElement error = wait.until(ExpectedConditions.visibilityOfElementLocated(errorMessage));
-            return error.isDisplayed();
-        } catch (TimeoutException e) {
-            return false;
-        }
+        return isToastMessageDisplayed(errorMessage);
     }
 
 }
