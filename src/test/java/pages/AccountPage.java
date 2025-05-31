@@ -41,18 +41,18 @@ public class AccountPage extends BasePage {
 
         public void uploadProfileImage() throws IOException {
             //String filePath = Paths.get("src", "test", "resources", "images", filename).toAbsolutePath().toString();
-           //File imageFile = new File("src/test/resources/images/profile.jpg");
-            ImageGenerator imageGenerator= new ImageGenerator();
-            File imageFile = imageGenerator.createTempImage();
+           File imageFile = new File("src/test/resources/images/profile.jpg");
+//            ImageGenerator imageGenerator= new ImageGenerator();
+//            File imageFile = imageGenerator.createTempImage();
             //System.out.println("Image file path>>>>>>>>: " + imageFile.getAbsolutePath());
             //File imageFile = new File("/shared/test.jpg");
 
-            System.out.println("Image file path>>>>>>>>: " + imageFile.getAbsolutePath());
-            if (!imageFile.exists()) {
-                System.out.println(" File does NOT exist at: " + imageFile.getAbsolutePath());
-            } else {
-                System.out.println(" File exists at: " + imageFile.getAbsolutePath());
-            }
+//            System.out.println("Image file path>>>>>>>>: " + imageFile.getAbsolutePath());
+//            if (!imageFile.exists()) {
+//                System.out.println(" File does NOT exist at: " + imageFile.getAbsolutePath());
+//            } else {
+//                System.out.println(" File exists at: " + imageFile.getAbsolutePath());
+//            }
             WebElement upload = wait.until(ExpectedConditions.presenceOfElementLocated(uploadInput));
             upload.sendKeys(imageFile.getAbsolutePath());
         }
