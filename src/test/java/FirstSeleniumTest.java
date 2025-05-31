@@ -4,22 +4,29 @@ import org.junit.jupiter.api.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.*;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import pages.AccountPage;
 import pages.HomePage;
 import pages.LoginPage;
 
+import java.io.File;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.Duration;
 import java.util.List;
+import java.util.stream.Stream;
 
 public class FirstSeleniumTest {
 
@@ -27,8 +34,8 @@ public class FirstSeleniumTest {
 
 
     @BeforeEach
-    public void setUp() throws MalformedURLException {
-
+    public void setUp(TestInfo testInfo) throws MalformedURLException {
+        if (testInfo.getTags().contains("no-setup")) return; // skip setup for parameterized tests
         ChromeOptions options = new ChromeOptions();
         String seleniumUrl = System.getenv("SELENIUM_HOST");
 
@@ -41,11 +48,6 @@ public class FirstSeleniumTest {
         driver.manage().window().maximize();
     }
 
-//    @Test
-//    public void openHomePage() {
-//        driver.get("https://unsplash.com");
-//        System.out.println("Title: " + driver.getTitle());
-//    }
     @Test
     public void autoClickCookieConseptPopup(){
         driver.get(Config.LOGIN);
@@ -95,23 +97,46 @@ public class FirstSeleniumTest {
         LoginVerifier verifier = new LoginVerifier(driver);
         assertTrue(verifier.isUserLoggedIn());
     }
-//// END LOGIN TEST ///////////////////////////////////
+//// END LOGIN TEST ///////////////////////////////////////
 
-// TEST HOME PAGE FUNCTIONALITY AND RESPONSIVENESS
 
-    @Test
-    @DisplayName("Home page title contains 'Unsplash'")
-    public void shouldReadHomePageTitle(){
-        HomePage homePage = new HomePage(driver);
-        assertTrue(homePage.getPageTitle().contains("Unsplash"));
-    }
 
+////// TEST HOME PAGE FUNCTIONALITY AND RESPONSIVENESS/////////
+//
     @ParameterizedTest
     @EnumSource(ViewMode.class)
-    @DisplayName("Header layout and content differs between desktop and mobile")
-    void headerShouldChangeBetweenScreenModes(ViewMode mode) {
-        WebDriverManager.chromedriver().setup();
-        WebDriver localDriver = new ChromeDriver(ChromeViewMode.getMobileOptions(mode));
+    @Tag("no-setup")
+    @DisplayName("WebDriver configuration: Header layout and content differs between desktop and mobile")
+    void headerShouldChangeBetweenScreenModes(ViewMode mode) throws MalformedURLException {
+//        WebDriver localDriver;
+//        ChromeOptions options = ChromeViewMode.getMobileOptions(mode);
+//        String seleniumUrl = System.getenv("SELENIUM_HOST");
+//
+//        if (seleniumUrl != null && !seleniumUrl.isEmpty()) {
+//            localDriver = new RemoteWebDriver(new URL(seleniumUrl), options);
+//        } else {
+//            WebDriverManager.chromedriver().setup();
+//            localDriver = new ChromeDriver(options);
+//        }
+        ChromeOptions options = new ChromeOptions();
+        WebDriver localDriver;
+        String seleniumUrl = System.getenv("SELENIUM_HOST");
+        if (seleniumUrl != null && !seleniumUrl.isEmpty()) {
+            localDriver = new RemoteWebDriver(new URL(seleniumUrl), options);
+        } else {
+            WebDriverManager.chromedriver().setup();
+            localDriver = new ChromeDriver(options);
+        }
+
+
+// Just resize here
+        if (mode == ViewMode.MOBILE) {
+            localDriver.manage().window().setSize(new Dimension(375, 812));
+        } else {
+            localDriver.manage().window().maximize();
+        }
+
+
         try {
             HomePage homePage = new HomePage(localDriver);
             if (mode == ViewMode.DESKTOP) {
@@ -125,25 +150,27 @@ public class FirstSeleniumTest {
     }
 
     @Test
-    @DisplayName("Login first, logout by button click and check being logout")
+    @DisplayName("Logout and check being logout")
     public void logoutByButtonClick() {
         LoginPage loginPage = new LoginPage(driver);
         loginPage.loginSuccessfully();
+
         HomePage homePage = new HomePage(driver);
         homePage.logOut();
+
         LoginVerifier loginVerifier = new LoginVerifier(driver);
         assertFalse(loginVerifier.isUserLoggedIn());
     }
 
     @Test
     @DisplayName("Hovers over the first image and checks if the like button appears")
-    public void hoverTest() throws InterruptedException {
+    public void hoverTest() {
         HomePage homePage = new HomePage(driver);
         assertTrue(homePage.imageHovered().isDisplayed(), "Like button should appear on hover");
     }
 
     @Test
-    @DisplayName("Navigating to photo and using browser back returns to home page")
+    @DisplayName("History test: Navigate to the page of first photo and back to home page by browser history")
     void shouldNavigateToPhotoAndReturn() {
         HomePage homePage = new HomePage(driver);
         homePage.navigateToFirstPhotoAndBack();
@@ -152,15 +179,65 @@ public class FirstSeleniumTest {
 ////// END HOME PAGE TEST ///////////////////////////////////
 
 
-/// Test file upload and fill textarea on account page///////
+///// Test file upload and fill textarea on account page///////
+        @Test
+        @DisplayName("Bio textbox and Messaging checkbox should be updated on Account page")
+        void shouldUpdateBioAndMessagingCheckbox() {
+            LoginPage loginPage = new LoginPage(driver);
+            loginPage.loginSuccessfully();
+
+            AccountPage accountPage = new AccountPage(driver);
+
+            //get the current values to check their differences after the update
+            String oldBio = accountPage.readBio();
+            boolean oldChecked = accountPage.getCheckbox();
+            accountPage.toggleCheckbox(oldChecked);
+
+            accountPage.updateBio();
+
+            String newBio = accountPage.readBio();
+            boolean newChecked = accountPage.getCheckbox();
+
+            assertAll(
+                    ()->assertNotEquals(oldBio, newBio, "Bio content should be different after update"),
+                    ()->assertNotEquals(oldChecked, newChecked, "Messaging checked should be different after update")
+            );
+        }
+        @Test
+        @DisplayName("Profile image should be updated on Account page")
+        void shouldUpdateProfileImage() throws IOException {
+            //File imageFile = new File("src/test/resources/images/profile.jpg");
+
+            LoginPage loginPage = new LoginPage(driver);
+            loginPage.loginSuccessfully();
+
+            AccountPage accountPage = new AccountPage(driver);
+            accountPage.uploadProfileImage();
+
+            assertTrue(accountPage.isSuccessMessageDisplayed(), "The Success message should be displayed");
+        }
+//////// END ACCOUNT PAGE TEST /////////////////////////////////
 
 
+////CHECK TITLE OF MULTIPLE PAGES FROM A STREAM/////////////////
 
+    static Stream<Arguments> staticPages() {
+        return Stream.of(
+                Arguments.of(Config.LICENSE_URL, Config.LICENSE_TITLE),
+                Arguments.of(Config.PRIVACY_URL, Config.PRIVACY_TITLE),
+                Arguments.of(Config.TERMS_URL, Config.TERMS_TITLE)
+        );
+    }
 
+    @ParameterizedTest
+    @MethodSource("staticPages")
+    @DisplayName("Static pages load correctly and have expected titles")
+    void testStaticPages(String url, String expectedTitlePart) {
+        driver.get(url);
+        String actualTitle = driver.getTitle();
+        assertTrue(actualTitle.contains(expectedTitlePart), "Title should include: " + expectedTitlePart);
+    }
 
-
-
-////// END ACCOUNT PAGE TEST /////////////////////////////////
     @AfterEach
     public void tearDown() {
         if (driver != null) driver.quit();

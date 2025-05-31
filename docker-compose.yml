@@ -5,7 +5,10 @@ services:
     image: selenium/standalone-chrome:4.19.1
     ports:
       - "4444:4444"
+      - "7900:7900"
     shm_size: 2g
+    volumes:
+      - ./shared:/shared
 
   test-runner:
     build: .
@@ -13,3 +16,5 @@ services:
       - selenium
     environment:
       - SELENIUM_HOST=http://selenium:4444/wd/hub
+    volumes:
+      - ./shared:/shared

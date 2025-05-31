@@ -7,7 +7,6 @@ import java.util.Map;
 
 public class ChromeViewMode {
 
-
     public static ChromeOptions getMobileOptions(ViewMode mode) {
         ChromeOptions options = new ChromeOptions();
         if(mode == ViewMode.MOBILE) {
@@ -21,10 +20,17 @@ public class ChromeViewMode {
             mobileEmulation.put("userAgent",
                     "Mozilla/5.0 (iPhone; CPU iPhone OS 15_2 like Mac OS X) " +
                             "AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.2 Mobile/15E148 Safari/604.1");
+            mobileEmulation.put("deviceName", "iPhone X");
+
             options.setExperimentalOption("mobileEmulation", mobileEmulation);
+
         }else {
             options.addArguments("start-maximized");
         }
+//        options.addArguments("--disable-gpu");
+//        options.addArguments("--no-sandbox");
+//        options.addArguments("--headless"); // or remove it to enable full view
+
         return options;
     }
 }

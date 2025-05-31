@@ -16,9 +16,7 @@ public class HomePage extends BasePage{
         super(driver);
         driver.get(Config.HOME);
     }
-    public String getPageTitle(){
-        return driver.getTitle();
-    }
+
     public void logOut(){
         //click(profileMenuBtnLocator);
         WebElement profileMenuBtn = wait.until(ExpectedConditions.visibilityOfElementLocated(profileMenuBtnLocator));
